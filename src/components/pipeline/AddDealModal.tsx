@@ -1,7 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import Modal from '../shared/Modal';
 import SearchableSelect from '../shared/SearchableSelect';
-import { Institution, Demand, InstitutionContact, ASSET_TYPE_LABELS } from '../../types';
+import { Institution, Demand, InstitutionContact, ASSET_TYPE_LABELS, INSTITUTION_TYPE_LABELS } from '../../types';
 import { fetchDemands, fetchContacts } from '../../lib/supabase';
 
 interface AddDealModalProps {
@@ -93,7 +93,7 @@ export default function AddDealModal({ isOpen, institutions, defaultStageKey, on
         <div className="space-y-1">
           <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Instituição</label>
           <SearchableSelect
-            options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.segment }))}
+            options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.type ? INSTITUTION_TYPE_LABELS[i.type] : undefined }))}
             value={institutionId || null}
             onChange={setInstitutionId}
             placeholder="Selecionar instituição..."

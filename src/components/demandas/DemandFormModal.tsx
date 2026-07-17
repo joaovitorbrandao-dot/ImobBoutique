@@ -1,7 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import Modal from '../shared/Modal';
 import SearchableSelect from '../shared/SearchableSelect';
-import { Demand, Institution, AssetType, DemandStatus, ASSET_TYPE_LABELS, DEMAND_STATUS_LABELS } from '../../types';
+import { Demand, Institution, AssetType, DemandStatus, ASSET_TYPE_LABELS, DEMAND_STATUS_LABELS, INSTITUTION_TYPE_LABELS } from '../../types';
 
 interface DemandFormModalProps {
   isOpen: boolean;
@@ -10,15 +10,17 @@ interface DemandFormModalProps {
   defaultInstitutionId?: string;
   onClose: () => void;
   onSave: (payload: {
-    institutionId: string; assetType: AssetType; budgetMin: number | null; budgetMax: number | null; region: string; status: DemandStatus; notes: string;
+    institutionId: string; assetType: AssetType; minAbl: number | null; budgetMin: number | null; budgetMax: number | null; capRate: number | null; region: string; status: DemandStatus; notes: string;
   }) => Promise<void>;
 }
 
 const emptyForm = {
   institutionId: '',
   assetType: 'escritorio' as AssetType,
+  minAbl: '',
   budgetMin: '',
   budgetMax: '',
+  capRate: '',
   region: '',
   status: 'aberta' as DemandStatus,
   notes: '',
@@ -36,8 +38,10 @@ export default function DemandFormModal({ isOpen, demand, institutions, defaultI
           ? {
               institutionId: demand.institutionId,
               assetType: demand.assetType,
+              minAbl: demand.minAbl?.toString() || '',
               budgetMin: demand.budgetMin?.toString() || '',
               budgetMax: demand.budgetMax?.toString() || '',
+              capRate: demand.capRate?.toString() || '',
               region: demand.region,
               status: demand.status,
               notes: demand.notes,
@@ -66,8 +70,10 @@ export default function DemandFormModal({ isOpen, demand, institutions, defaultI
       await onSave({
         institutionId: form.institutionId,
         assetType: form.assetType,
+        minAbl: form.minAbl ? Number(form.minAbl) : null,
         budgetMin,
         budgetMax,
+        capRate: form.capRate ? Number(form.capRate) : null,
         region: form.region,
         status: form.status,
         notes: form.notes,
@@ -86,7 +92,7 @@ export default function DemandFormModal({ isOpen, demand, institutions, defaultI
         <div className="space-y-1">
           <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Instituição</label>
           <SearchableSelect
-            options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.segment }))}
+            options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.type ? INSTITUTION_TYPE_LABELS[i.type] : undefined }))}
             value={form.institutionId || null}
             onChange={(v) => setForm({ ...form, institutionId: v })}
             placeholder="Selecionar instituição..."
@@ -120,9 +126,21 @@ export default function DemandFormModal({ isOpen, demand, institutions, defaultI
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-[11px] font-bold text-slate-400 tracking-wider block">ABL Mínimo (m²)</label>
+          <input
+            type="number"
+            min="0"
+            value={form.minAbl}
+            onChange={(e) => setForm({ ...form, minAbl: e.target.value })}
+            placeholder="Área Bruta Locável mínima"
+            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-1 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Orçamento Mínimo (R$)</label>
+            <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Valor Mínimo (R$)</label>
             <input
               type="number"
               min="0"
@@ -132,12 +150,23 @@ export default function DemandFormModal({ isOpen, demand, institutions, defaultI
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Orçamento Máximo (R$)</label>
+            <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Valor Máximo (R$)</label>
             <input
               type="number"
               min="0"
               value={form.budgetMax}
               onChange={(e) => setForm({ ...form, budgetMax: e.target.value })}
+              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-1 focus:ring-indigo-500"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Cap Rate (%)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={form.capRate}
+              onChange={(e) => setForm({ ...form, capRate: e.target.value })}
               className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-1 focus:ring-indigo-500"
             />
           </div>

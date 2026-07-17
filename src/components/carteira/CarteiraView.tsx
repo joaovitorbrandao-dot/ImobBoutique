@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Search, Users, ClipboardList, Columns4 } from 'lucide-react';
-import { Institution } from '../../types';
-import { fetchInstitutions, createInstitution, updateInstitution, deleteInstitution } from '../../lib/supabase';
+import { Institution, INSTITUTION_TYPE_LABELS } from '../../types';
+import { fetchInstitutions, deleteInstitution } from '../../lib/supabase';
 import InstitutionFormModal from './InstitutionFormModal';
 import InstitutionDetailPanel from './InstitutionDetailPanel';
 import ConfirmDialog from '../shared/ConfirmDialog';
@@ -43,10 +43,8 @@ export default function CarteiraView() {
     return () => clearTimeout(timeout);
   }, [search]);
 
-  const handleSave = async (payload: { name: string; segment: string; notes: string }) => {
+  const handleSaved = async () => {
     const editingId = editingInstitution?.id;
-    if (editingId) await updateInstitution(editingId, payload);
-    else await createInstitution(payload);
     const data = await load(search);
     if (editingId && selectedInstitution?.id === editingId) {
       setSelectedInstitution(data.find((i) => i.id === editingId) || null);
@@ -110,7 +108,7 @@ export default function CarteiraView() {
             <thead>
               <tr className="bg-slate-50/60 border-b border-slate-100">
                 <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider">Instituição</th>
-                <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider">Segmento</th>
+                <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider">Tipo</th>
                 <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider text-center">Contatos</th>
                 <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider text-center">Demandas</th>
                 <th className="px-5 py-3 text-[10.5px] font-bold text-slate-400 tracking-wider text-center">Negociações</th>
@@ -124,7 +122,7 @@ export default function CarteiraView() {
                   className="hover:bg-indigo-50/30 transition-colors cursor-pointer"
                 >
                   <td className="px-5 py-3.5 text-xs font-bold text-slate-800">{inst.name}</td>
-                  <td className="px-5 py-3.5 text-xs text-slate-500 font-semibold">{inst.segment || '—'}</td>
+                  <td className="px-5 py-3.5 text-xs text-slate-500 font-semibold">{inst.type ? INSTITUTION_TYPE_LABELS[inst.type] : '—'}</td>
                   <td className="px-5 py-3.5 text-xs text-slate-500 font-semibold text-center flex items-center justify-center gap-1">
                     <Users className="w-3.5 h-3.5 text-slate-300" /> {inst.contactCount ?? 0}
                   </td>
@@ -145,7 +143,7 @@ export default function CarteiraView() {
         isOpen={isFormOpen}
         institution={editingInstitution}
         onClose={() => setIsFormOpen(false)}
-        onSave={handleSave}
+        onSaved={handleSaved}
       />
 
       {selectedInstitution && (

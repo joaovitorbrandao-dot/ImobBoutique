@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, ClipboardList, Pencil, Trash2 } from 'lucide-react';
 import { Demand, Institution, AssetType, DemandStatus, ASSET_TYPE_LABELS, DEMAND_STATUS_LABELS } from '../../types';
 import { fetchDemands, fetchInstitutions, createDemand, updateDemand, deleteDemand } from '../../lib/supabase';
-import { formatCurrencyCompact } from '../../lib/format';
+import { formatCurrencyCompact, formatArea, formatPercent } from '../../lib/format';
 import DemandFormModal from './DemandFormModal';
 import ConfirmDialog from '../shared/ConfirmDialog';
 import EmptyState from '../shared/EmptyState';
@@ -55,7 +55,7 @@ export default function DemandasView() {
   }, [institutionFilter, statusFilter, assetTypeFilter]);
 
   const handleSave = async (payload: {
-    institutionId: string; assetType: AssetType; budgetMin: number | null; budgetMax: number | null; region: string; status: DemandStatus; notes: string;
+    institutionId: string; assetType: AssetType; minAbl: number | null; budgetMin: number | null; budgetMax: number | null; capRate: number | null; region: string; status: DemandStatus; notes: string;
   }) => {
     if (editingDemand) await updateDemand(editingDemand.id, payload);
     else await createDemand(payload);
@@ -156,6 +156,12 @@ export default function DemandasView() {
               </div>
 
               <div className="text-xs text-slate-600 font-semibold">{budgetLabel(demand)}</div>
+              {(demand.minAbl || demand.capRate) && (
+                <div className="flex gap-3 text-[11px] text-slate-400 font-semibold">
+                  {demand.minAbl && <span>ABL mín.: {formatArea(demand.minAbl)}</span>}
+                  {demand.capRate && <span>Cap Rate: {formatPercent(demand.capRate)}</span>}
+                </div>
+              )}
               {demand.region && <div className="text-[11px] text-slate-400 font-medium">{demand.region}</div>}
               {demand.notes && <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">{demand.notes}</p>}
 

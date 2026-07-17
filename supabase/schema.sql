@@ -16,7 +16,8 @@ $$ language plpgsql;
 create table if not exists public.institutions (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  segment text,
+  type text check (type in
+    ('fii','fip','varejo','academia','farmacia','incorporadora','parceiro')),
   notes text default '',
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
@@ -51,8 +52,10 @@ create table if not exists public.demands (
   institution_id uuid not null references public.institutions(id) on delete restrict,
   asset_type text not null check (asset_type in
     ('galpao','laje_corporativa','escritorio','terreno','varejo','industrial','hotel','outro')),
+  min_abl numeric(12,2),
   budget_min numeric(14,2),
   budget_max numeric(14,2),
+  cap_rate numeric(5,2),
   region text default '',
   status text not null default 'aberta' check (status in ('aberta','em_atendimento','atendida','cancelada')),
   notes text default '',

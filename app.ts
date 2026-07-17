@@ -95,9 +95,9 @@ export function createApp(): Express {
       .from('institutions')
       .select('*, institution_contacts(count), demands(count), deals(count)')
       .order('name', { ascending: true });
-    const { search, segment } = req.query;
+    const { search, type } = req.query;
     if (typeof search === 'string' && search.trim()) query = query.ilike('name', `%${search.trim()}%`);
-    if (typeof segment === 'string' && segment.trim()) query = query.eq('segment', segment.trim());
+    if (typeof type === 'string' && type.trim()) query = query.eq('type', type.trim());
     const { data, error } = await query;
     if (error) return res.status(500).json({ success: false, error: error.message });
     res.json({ success: true, institutions: data || [] });
@@ -118,9 +118,9 @@ export function createApp(): Express {
   app.post('/api/institutions', async (req, res) => {
     const client = requireClient(req, res);
     if (!client) return;
-    const { name, segment, notes } = req.body || {};
+    const { name, type, notes } = req.body || {};
     if (!name) return res.status(400).json({ success: false, error: 'name é obrigatório' });
-    const { data, error } = await client.from('institutions').insert({ name, segment: segment || null, notes: notes || '' }).select().single();
+    const { data, error } = await client.from('institutions').insert({ name, type: type || null, notes: notes || '' }).select().single();
     if (error) return res.status(500).json({ success: false, error: error.message });
     res.json({ success: true, institution: data });
   });
@@ -128,10 +128,10 @@ export function createApp(): Express {
   app.put('/api/institutions/:id', async (req, res) => {
     const client = requireClient(req, res);
     if (!client) return;
-    const { name, segment, notes } = req.body || {};
+    const { name, type, notes } = req.body || {};
     const { data, error } = await client
       .from('institutions')
-      .update({ name, segment: segment || null, notes: notes || '' })
+      .update({ name, type: type || null, notes: notes || '' })
       .eq('id', req.params.id)
       .select()
       .single();
@@ -243,15 +243,17 @@ export function createApp(): Express {
   app.post('/api/demands', async (req, res) => {
     const client = requireClient(req, res);
     if (!client) return;
-    const { institutionId, assetType, budgetMin, budgetMax, region, status, notes } = req.body || {};
+    const { institutionId, assetType, minAbl, budgetMin, budgetMax, capRate, region, status, notes } = req.body || {};
     if (!institutionId || !assetType) return res.status(400).json({ success: false, error: 'institutionId e assetType são obrigatórios' });
     const { data, error } = await client
       .from('demands')
       .insert({
         institution_id: institutionId,
         asset_type: assetType,
+        min_abl: minAbl ?? null,
         budget_min: budgetMin ?? null,
         budget_max: budgetMax ?? null,
+        cap_rate: capRate ?? null,
         region: region || '',
         status: status || 'aberta',
         notes: notes || ''
@@ -265,14 +267,16 @@ export function createApp(): Express {
   app.put('/api/demands/:id', async (req, res) => {
     const client = requireClient(req, res);
     if (!client) return;
-    const { institutionId, assetType, budgetMin, budgetMax, region, status, notes } = req.body || {};
+    const { institutionId, assetType, minAbl, budgetMin, budgetMax, capRate, region, status, notes } = req.body || {};
     const { data, error } = await client
       .from('demands')
       .update({
         institution_id: institutionId,
         asset_type: assetType,
+        min_abl: minAbl ?? null,
         budget_min: budgetMin ?? null,
         budget_max: budgetMax ?? null,
+        cap_rate: capRate ?? null,
         region: region || '',
         status,
         notes: notes || ''

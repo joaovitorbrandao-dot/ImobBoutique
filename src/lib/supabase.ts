@@ -93,7 +93,7 @@ const mapContact = (row: any): InstitutionContact => ({
 const mapInstitution = (row: any): Institution => ({
   id: row.id,
   name: row.name,
-  segment: row.segment || '',
+  type: row.type || null,
   notes: row.notes || '',
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -112,8 +112,10 @@ const mapDemand = (row: any): Demand => ({
   institutionId: row.institution_id,
   institutionName: row.institutions?.name,
   assetType: row.asset_type,
+  minAbl: row.min_abl !== null && row.min_abl !== undefined ? Number(row.min_abl) : null,
   budgetMin: row.budget_min !== null && row.budget_min !== undefined ? Number(row.budget_min) : null,
   budgetMax: row.budget_max !== null && row.budget_max !== undefined ? Number(row.budget_max) : null,
+  capRate: row.cap_rate !== null && row.cap_rate !== undefined ? Number(row.cap_rate) : null,
   region: row.region || '',
   status: row.status,
   notes: row.notes || '',
@@ -190,7 +192,7 @@ const mapDeal = (row: any): Deal => ({
 // Institutions
 // ---------------------------------------------------------------------
 
-export const fetchInstitutions = async (params?: { search?: string; segment?: string }): Promise<Institution[]> => {
+export const fetchInstitutions = async (params?: { search?: string; type?: string }): Promise<Institution[]> => {
   const data = await request<{ institutions: any[] }>(`/api/institutions${buildQueryString(params)}`);
   return data.institutions.map(mapInstitution);
 };
@@ -200,12 +202,12 @@ export const fetchInstitution = async (id: string): Promise<Institution> => {
   return mapInstitution(data.institution);
 };
 
-export const createInstitution = async (payload: { name: string; segment: string; notes: string }): Promise<Institution> => {
+export const createInstitution = async (payload: { name: string; type: string; notes: string }): Promise<Institution> => {
   const data = await request<{ institution: any }>('/api/institutions', { method: 'POST', body: JSON.stringify(payload) });
   return mapInstitution(data.institution);
 };
 
-export const updateInstitution = async (id: string, payload: { name: string; segment: string; notes: string }): Promise<Institution> => {
+export const updateInstitution = async (id: string, payload: { name: string; type: string; notes: string }): Promise<Institution> => {
   const data = await request<{ institution: any }>(`/api/institutions/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
   return mapInstitution(data.institution);
 };
@@ -250,14 +252,14 @@ export const fetchDemands = async (params?: { institution_id?: string; status?: 
 };
 
 export const createDemand = async (payload: {
-  institutionId: string; assetType: string; budgetMin: number | null; budgetMax: number | null; region: string; status: string; notes: string;
+  institutionId: string; assetType: string; minAbl: number | null; budgetMin: number | null; budgetMax: number | null; capRate: number | null; region: string; status: string; notes: string;
 }): Promise<Demand> => {
   const data = await request<{ demand: any }>('/api/demands', { method: 'POST', body: JSON.stringify(payload) });
   return mapDemand(data.demand);
 };
 
 export const updateDemand = async (id: string, payload: {
-  institutionId: string; assetType: string; budgetMin: number | null; budgetMax: number | null; region: string; status: string; notes: string;
+  institutionId: string; assetType: string; minAbl: number | null; budgetMin: number | null; budgetMax: number | null; capRate: number | null; region: string; status: string; notes: string;
 }): Promise<Demand> => {
   const data = await request<{ demand: any }>(`/api/demands/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
   return mapDemand(data.demand);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, Home, Plus, Calendar, ExternalLink, Video, Save } from 'lucide-react';
-import { Deal, Institution, Demand, InstitutionContact, PipelineStage, ASSET_TYPE_LABELS } from '../../types';
+import { Deal, Institution, Demand, InstitutionContact, PipelineStage, ASSET_TYPE_LABELS, INSTITUTION_TYPE_LABELS } from '../../types';
 import { fetchDeal, fetchDemands, fetchContacts, updateDeal, deleteDeal, reorderDeals, deleteDealCalendarEvent } from '../../lib/supabase';
 import { formatCurrencyCompact, formatDateTime } from '../../lib/format';
 import SearchableSelect from '../shared/SearchableSelect';
@@ -167,7 +167,7 @@ export default function DealDetailPanel({ dealId, institutions, stages, onClose,
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-400 tracking-wider block">Instituição</label>
                 <SearchableSelect
-                  options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.segment }))}
+                  options={institutions.map((i) => ({ value: i.id, label: i.name, sublabel: i.type ? INSTITUTION_TYPE_LABELS[i.type] : undefined }))}
                   value={form.institutionId || null}
                   onChange={handleInstitutionChange}
                 />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Pencil, Trash2, Plus, Star, Mail, Phone, ClipboardList, Columns4 } from 'lucide-react';
-import { Institution, InstitutionContact } from '../../types';
+import { Institution, InstitutionContact, INSTITUTION_TYPE_LABELS } from '../../types';
 import { fetchContacts, createContact, updateContact, deleteContact } from '../../lib/supabase';
 import ContactFormModal from './ContactFormModal';
 import ConfirmDialog from '../shared/ConfirmDialog';
@@ -67,7 +67,7 @@ export default function InstitutionDetailPanel({ institution, onClose, onEdit, o
           <div className="sticky top-0 bg-white border-b border-slate-100 p-5 flex items-start justify-between z-10">
             <div>
               <h2 className="text-sm font-extrabold text-slate-800 tracking-wide">{institution.name}</h2>
-              {institution.segment && <p className="text-[11px] text-slate-400 font-bold mt-0.5">{institution.segment}</p>}
+              {institution.type && <p className="text-[11px] text-slate-400 font-bold mt-0.5">{INSTITUTION_TYPE_LABELS[institution.type]}</p>}
             </div>
             <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg cursor-pointer">
               <X className="w-4 h-4 text-slate-400" />

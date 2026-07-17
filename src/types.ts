@@ -37,6 +37,18 @@ export const ASSET_STATUS_LABELS: Record<AssetStatus, string> = {
   indisponivel: 'Indisponível',
 };
 
+export type InstitutionType = 'fii' | 'fip' | 'varejo' | 'academia' | 'farmacia' | 'incorporadora' | 'parceiro';
+
+export const INSTITUTION_TYPE_LABELS: Record<InstitutionType, string> = {
+  fii: 'FII',
+  fip: 'FIP',
+  varejo: 'Varejo',
+  academia: 'Academia',
+  farmacia: 'Farmácia',
+  incorporadora: 'Incorporadora',
+  parceiro: 'Parceiro',
+};
+
 export interface InstitutionContact {
   id: string;
   institutionId: string;
@@ -52,7 +64,7 @@ export interface InstitutionContact {
 export interface Institution {
   id: string;
   name: string;
-  segment: string;
+  type: InstitutionType | null;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -67,8 +79,10 @@ export interface Demand {
   institutionId: string;
   institutionName?: string;
   assetType: AssetType;
+  minAbl: number | null;
   budgetMin: number | null;
   budgetMax: number | null;
+  capRate: number | null;
   region: string;
   status: DemandStatus;
   notes: string;
